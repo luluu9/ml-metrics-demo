@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Imbalance Visualization</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Class Imbalance Impact on Metrics</h1>
+        <div class="visualization-container">
+            <div class="controls">
+                <h2>Controls</h2>                <div class="control-group">
+                    <label>Interaction Mode:</label>
+                    <div class="button-group">
+                        <button id="add-mode" class="active">Add Dots</button>
+                        <button id="remove-mode">Remove Dots</button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Random Generation:</label>
+                    <div class="input-group">
+                        <div>
+                            <label for="total-dots">Total dots:</label>
+                            <input type="number" id="total-dots" value="100" min="10" max="500">
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <div class="slider-container">
+                            <label for="class-balance">Class Balance (Positives vs Negatives):</label>
+                            <input type="range" id="class-balance" min="0" max="100" value="50" class="slider">
+                            <div class="slider-labels">
+                                <span>All Negatives</span>
+                                <span>Even</span>
+                                <span>All Positives</span>
+                            </div>
+                            <div class="slider-value" id="class-balance-value">50% Positives / 50% Negatives</div>
+                        </div>
+
+                        <div class="slider-container">
+                            <label for="prediction-accuracy">Prediction Accuracy (True vs False):</label>
+                            <input type="range" id="prediction-accuracy" min="0" max="100" value="80" class="slider">
+                            <div class="slider-labels">
+                                <span>All False</span>
+                                <span>Even</span>
+                                <span>All True</span>
+                            </div>
+                            <div class="slider-value" id="prediction-accuracy-value">80% True / 20% False</div>
+                        </div>                        <div class="distribution-preview">
+                            <div class="preview-title">
+                                Distribution & Point Counts <span id="total-points-display">(Total: 0)</span>
+                                <div class="preview-subtitle">Shows actual distribution when dots are present</div>
+                            </div>
+                            <div class="preview-grid">
+                                <div class="preview-cell">
+                                    <div class="preview-label">TP:</div>
+                                    <div class="preview-values">
+                                        <div id="preview-tp" class="preview-value">40%</div>
+                                        <div id="tp-count" class="point-count">0</div>
+                                    </div>
+                                </div>
+                                <div class="preview-cell">
+                                    <div class="preview-label">FP:</div>
+                                    <div class="preview-values">
+                                        <div id="preview-fp" class="preview-value">10%</div>
+                                        <div id="fp-count" class="point-count">0</div>
+                                    </div>
+                                </div>
+                                <div class="preview-cell">
+                                    <div class="preview-label">FN:</div>
+                                    <div class="preview-values">
+                                        <div id="preview-fn" class="preview-value">10%</div>
+                                        <div id="fn-count" class="point-count">0</div>
+                                    </div>
+                                </div>
+                                <div class="preview-cell">
+                                    <div class="preview-label">TN:</div>
+                                    <div class="preview-values">
+                                        <div id="preview-tn" class="preview-value">40%</div>
+                                        <div id="tn-count" class="point-count">0</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="generate-random">Generate Random Distribution</button>
+                    <button id="clear-all">Clear All Dots</button>
+                </div>
+            </div>
+            
+            <div class="visualization">
+                <div id="diagram-container">
+                    <!-- D3 diagram will be added here -->
+                </div>                <div class="legend">
+                    <div class="legend-section">
+                        <div class="legend-title">Points:</div>
+                        <div class="legend-items">
+                            <div class="legend-item">
+                                <span class="legend-color tp"></span>
+                                <span>True Positive (TP)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color fn"></span>
+                                <span>False Negative (FN)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color fp"></span>
+                                <span>False Positive (FP)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color tn"></span>
+                                <span>True Negative (TN)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="legend-section">
+                        <div class="legend-title">Regions:</div>
+                        <div class="legend-items">
+                            <div class="legend-item">
+                                <span class="legend-bg positive"></span>
+                                <span>Predicted Positive (Inside Circle)</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-bg negative"></span>
+                                <span>Predicted Negative (Outside Circle)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+              <div class="metrics">
+                <h2>Metrics</h2>
+                <div class="metrics-container">
+                    <div class="metric">
+                        <div class="metric-name">Accuracy:</div>
+                        <div id="accuracy" class="metric-value">N/A</div>
+                        <div class="metric-formula">(TP + TN) / (TP + TN + FP + FN)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-name">Precision:</div>
+                        <div id="precision" class="metric-value">N/A</div>
+                        <div class="metric-formula">TP / (TP + FP)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-name">Recall:</div>
+                        <div id="recall" class="metric-value">N/A</div>
+                        <div class="metric-formula">TP / (TP + FN)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-name">F1-Score:</div>
+                        <div id="f1-score" class="metric-value">N/A</div>
+                        <div class="metric-formula">2 * (Precision * Recall) / (Precision + Recall)</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-name">MCC:</div>
+                        <div id="mcc" class="metric-value">N/A</div>
+                        <div class="metric-formula">(TP*TN - FP*FN) / √((TP+FP)(TP+FN)(TN+FP)(TN+FN))</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-name">G-Mean Recall:</div>
+                        <div id="g-mean" class="metric-value">N/A</div>
+                        <div class="metric-formula">√(TPR * TNR) = √(Recall * Specificity)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
