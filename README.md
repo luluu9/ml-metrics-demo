@@ -2,6 +2,8 @@
 
 An interactive web-based tool for visualizing and understanding the impact of class imbalance on machine learning evaluation metrics.
 
+**This demo is available at**: [https://luluu9.github.io/ml-metrics-demo/](https://luluu9.github.io/ml-metrics-demo/)
+
 <img src="img/demo.png" alt="Demo of Class Imbalance Visualization" width="900">
 
 ## Overview
